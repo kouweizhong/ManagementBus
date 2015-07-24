@@ -33,18 +33,10 @@
     <Reference Include="M2Mqtt.Net">
       <HintPath>..\packages\M2Mqtt.4.1.0.1\lib\net45\M2Mqtt.Net.dll</HintPath>
     </Reference>
-    <Reference Include="ManagementBus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\EBGames.Core.CircuitBreaker\bin\Debug\ManagementBus.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
@@ -56,6 +48,7 @@
     <Compile Include="TopicSubscription.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ManagementBus.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
