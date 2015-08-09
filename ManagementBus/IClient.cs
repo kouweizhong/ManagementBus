@@ -7,5 +7,6 @@ namespace ManagementBus
         void SendMessage(string topic, string message);
         List<ITopicSubscription> TopicSubscriptions { get; set; }
         string ClientId { get; }
+        bool IsConnected { get; }
     }
 }
