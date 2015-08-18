@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
@@ -17,13 +16,15 @@ namespace ManagementBus
         private readonly MqttConfiguration _config;
         private List<ITopicSubscription> _topicSubscriptions;
 
-        private Timer _connectionTimer;
+        private System.Timers.Timer _connectionTimer;
 
         public Client()
         {
             _topicSubscriptions = Enumerable.Empty<ITopicSubscription>().ToList();
 
             _config = new MqttConfiguration();
+
+            StartConnectionTimer();
             ConnectAndSetupListener();
         }
 
@@ -46,36 +47,37 @@ namespace ManagementBus
             }
         }
 
+
+        private bool _isConnecting;
+
         private void ConnectAndSetupListener()
         {
-            if (IsConnected)
-            {
-                if (_connectionTimer != null)
-                    StopConnectionTimer();
-
+            // Validate that we're not trying to establish a connection or are already connected.
+            if (_isConnecting || IsConnected)
                 return;
-            }
 
             try
             {
+                _isConnecting = true;
+
                 // TODO: Add security credentials / make configurable.
                 _mqttClient = new MqttClient(_config.Server, _config.ServerPort, false, null);
                 _mqttClient.MqttMsgPublishReceived += MqttClientOnMqttMsgPublishReceived;
                 _mqttClient.Connect(_config.ClientId);
-
-                StopConnectionTimer();
 
                 SubscribeTopics();
             }
             catch (Exception ex)
             {
                 // TODO: Look into logging.
-                Trace.TraceError("Failed to connect to server: {0}:{1}.  Exception: {2}", 
-                    _config == null ? string.Empty : _config.Server, 
-                    _config == null ? string.Empty : _config.ServerPort.ToString(), 
+                Trace.TraceError("Failed to connect to server: {0}:{1}.  Exception: {2}",
+                    _config == null ? string.Empty : _config.Server,
+                    _config == null ? string.Empty : _config.ServerPort.ToString(),
                     ex);
-
-                StartConnectionTimer();
+            }
+            finally
+            {
+                _isConnecting = false;
             }
         }
 
@@ -139,21 +141,16 @@ namespace ManagementBus
                 topicSub.ProcessMessage(e.Message);
             }
         }
-
-        private void StopConnectionTimer()
-        {
-            if (_connectionTimer == null)
-                return;
-
-            _connectionTimer.Dispose();
-        }
-
+        
         private void StartConnectionTimer()
         {
             if (_connectionTimer != null)
                 return;
 
-            _connectionTimer = new Timer(state => ConnectAndSetupListener(), null, ConnectionRetrySeconds * 1000, Timeout.Infinite);
+            _connectionTimer = new System.Timers.Timer(ConnectionRetrySeconds*1000);
+            _connectionTimer.Elapsed += (sender, args) => ConnectAndSetupListener();
+            _connectionTimer.Enabled = true;
+            _connectionTimer.Start();
         }
     }
 }
