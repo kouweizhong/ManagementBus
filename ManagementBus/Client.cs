@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
@@ -30,15 +31,17 @@ namespace ManagementBus
 
         public delegate void MessageReceivedEventHandler(string topic, string message);
 
-        public void SendMessage(string topic, string message)
+        public void SendMessage<T>(string topic, T data) where T : class
         {
             if (!IsConnected)
                 return;
-
-            var byteMessage = Encoding.UTF8.GetBytes(message);
-
+            
             try
             {
+                var dataSerialised = JsonConvert.SerializeObject(data);
+
+                var byteMessage = Encoding.UTF8.GetBytes(dataSerialised);
+
                 _mqttClient.Publish(topic, byteMessage, MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
             }
             catch (Exception ex)
@@ -46,8 +49,7 @@ namespace ManagementBus
                 Trace.TraceError("Failed to send message to topic: {0}.  Exception: {1}", topic, ex);
             }
         }
-
-
+        
         private bool _isConnecting;
 
         private void ConnectAndSetupListener()
@@ -133,12 +135,26 @@ namespace ManagementBus
 
         private void MqttClientOnMqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
         {
-            var topicSubs = _topicSubscriptions.Where(x => x.Topic == e.Topic);
-
-            foreach (var topicSub in topicSubs)
+            try
             {
-                // Process new message.
-                topicSub.ProcessMessage(e.Message);
+                if (e.Message == null || e.Message.Length == 0)
+                    return;
+
+                var topicSubs = _topicSubscriptions.Where(x => x.Topic == e.Topic).ToList();
+
+                if (!topicSubs.Any())
+                    return;
+
+                var messageString = Encoding.Default.GetString(e.Message);
+                
+                foreach (var topicSub in topicSubs)
+                {
+                    topicSub.ProcessMessage(messageString);
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(string.Format("an error occured while processing published message.  Ex: {0}.  Stack: {1}", ex.Message, ex.StackTrace));
             }
         }
         

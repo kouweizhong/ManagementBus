@@ -11,6 +11,6 @@ namespace ManagementBus
         /// Process the message received on the topic.
         /// </summary>
         /// <param name="message"></param>
-        void ProcessMessage(byte[] message);
+        void ProcessMessage(string message);
     }
 }
