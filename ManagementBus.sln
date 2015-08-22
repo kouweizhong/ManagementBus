@@ -5,6 +5,10 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagementBus", "ManagementBus\ManagementBus.csproj", "{9A321744-2B46-494A-889C-C42B35A49ED0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagementBus.Tests", "ManagementBus.Tests\ManagementBus.Tests.csproj", "{6E674339-A30F-483B-AF23-D501D251F69A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagementBus.Interfaces", "ManagementBus.Interfaces\ManagementBus.Interfaces.csproj", "{1518F8A8-353D-4565-9AD6-CC8A40984CF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{9A321744-2B46-494A-889C-C42B35A49ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A321744-2B46-494A-889C-C42B35A49ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A321744-2B46-494A-889C-C42B35A49ED0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E674339-A30F-483B-AF23-D501D251F69A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E674339-A30F-483B-AF23-D501D251F69A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E674339-A30F-483B-AF23-D501D251F69A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E674339-A30F-483B-AF23-D501D251F69A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1518F8A8-353D-4565-9AD6-CC8A40984CF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1518F8A8-353D-4565-9AD6-CC8A40984CF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1518F8A8-353D-4565-9AD6-CC8A40984CF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1518F8A8-353D-4565-9AD6-CC8A40984CF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

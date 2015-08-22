@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using ManagementBus.Interfaces;
 using Newtonsoft.Json;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
@@ -82,38 +83,25 @@ namespace ManagementBus
                 _isConnecting = false;
             }
         }
-
-
-        public List<ITopicSubscription> TopicSubscriptions
-        {
-            get { return _topicSubscriptions; }
-            set
-            {
-                _topicSubscriptions = value;
-                
-                // Create the subscriptions.
-                SubscribeTopics();
-            }
-        }
-
+        
         private void SubscribeTopics()
         {
             if (!IsConnected)
                 return;
 
-            foreach (var subscription in _topicSubscriptions)
+            _topicSubscriptions.ForEach(x => SubscribeTopic(x.Topic));
+        }
+
+        private void SubscribeTopic(string topic)
+        {
+            try
             {
-                try
-                {
-                    // Subscribing to an array of topics appears to break M2Mqtt.
-                    _mqttClient.Subscribe(new[] { subscription.Topic }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
-                }
-                catch (Exception ex)
-                {
-                    Trace.TraceError("Topic subscription failed.  Topic: {0}  Exception: {1}", 
-                        subscription != null && !string.IsNullOrEmpty(subscription.Topic) ? subscription.Topic : string.Empty,
-                        ex);
-                }
+                // Subscribing to an array of topics appears to break M2Mqtt.
+                _mqttClient.Subscribe(new[] { topic }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Topic subscription failed.  Topic: {0}  Exception: {1}", topic, ex);
             }
         }
 
@@ -131,6 +119,15 @@ namespace ManagementBus
 
                 return false;
             }
+        }
+
+        public void AddTopicSubscription<T>(string topic, Action<T> messageHandler) where T : class
+        {
+            _topicSubscriptions.Add(new TopicSubscription<T>(topic, messageHandler));
+
+            if (IsConnected)
+                SubscribeTopic(topic);
+
         }
 
         private void MqttClientOnMqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)

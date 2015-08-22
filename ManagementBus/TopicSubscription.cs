@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace ManagementBus
 {
-    public class TopicSubscription<T> : ITopicSubscription where T : IMessage
+    internal class TopicSubscription<T> : ITopicSubscription where T : class
     {
         private readonly Action<T> _messageProcessor;
 
